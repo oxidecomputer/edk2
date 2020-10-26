@@ -1,0 +1,4 @@
+%rename cpp	old_cpp
+
+*cpp:
+%(cpp_subtarget)
