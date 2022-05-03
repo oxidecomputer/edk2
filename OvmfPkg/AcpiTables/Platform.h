@@ -45,10 +45,12 @@
 #define DAY_ALRM        0x00
 #define MON_ALRM        0x00
 #define CENTURY         0x00
+// Until PM Timer emulation is more complete, indicate that it's a 32-bit timer
 #define FLAG            (EFI_ACPI_2_0_WBINVD | \
                          EFI_ACPI_2_0_PROC_C1 | \
                          EFI_ACPI_2_0_SLP_BUTTON | \
                          EFI_ACPI_2_0_RTC_S4 | \
+                         EFI_ACPI_2_0_TMR_VAL_EXT | \
                          EFI_ACPI_2_0_RESET_REG_SUP)
 #define RESET_REG       0xCF9
 #define RESET_VALUE     (BIT2 | BIT1) // PIIX3 Reset CPU + System Reset

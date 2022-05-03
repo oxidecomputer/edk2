@@ -572,13 +572,13 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 4) {
             IO (Decode16, 0x0E0, 0x0E0, 0x00, 0x10)
             IO (Decode16, 0x1E0, 0x1E0, 0x00, 0x10)
             IO (Decode16, 0x160, 0x160, 0x00, 0x10)
-            IO (Decode16, 0x278, 0x278, 0x00, 0x08)
+            // IO (Decode16, 0x278, 0x278, 0x00, 0x08) Parallel port (alt)
             IO (Decode16, 0x370, 0x370, 0x00, 0x02)
-            IO (Decode16, 0x378, 0x378, 0x00, 0x08)
+            // IO (Decode16, 0x378, 0x378, 0x00, 0x08) Parallel port
             IO (Decode16, FixedPcdGet16 (PcdDebugIoPort), FixedPcdGet16 (PcdDebugIoPort), 0x00, 0x01)
             IO (Decode16, 0x440, 0x440, 0x00, 0x10)
-            IO (Decode16, 0x678, 0x678, 0x00, 0x08)
-            IO (Decode16, 0x778, 0x778, 0x00, 0x08)
+            // IO (Decode16, 0x678, 0x678, 0x00, 0x08) Parallel port (alt
+            // IO (Decode16, 0x778, 0x778, 0x00, 0x08) Parallel port
             IO (Decode16, 0xafe0, 0xafe0, 0x00, 0x04)      // QEMU GPE0 BLK
             IO (Decode16, 0xb000, 0xb000, 0x00, 0x40)      // PMBLK1
             Memory32Fixed (ReadOnly, 0xFEC00000, 0x1000)   // IO APIC
@@ -598,21 +598,6 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 4) {
             IRQNoFlags () {1}
             //
             // list of IRQs occupied thus far: 9, 5, 10, 11, 2, 0, 8, 13, 1
-            //
-          })
-        }
-
-        //
-        // PS/2 Mouse and Microsoft Mouse
-        //
-        Device (PS2M) {  // PS/2 stype mouse port
-          Name (_HID, EISAID ("PNP0F03"))
-          Name (_CID, EISAID ("PNP0F13"))
-          Name (_CRS, ResourceTemplate() {
-            IRQNoFlags () {12}
-            //
-            // list of IRQs occupied thus far:
-            // 9, 5, 10, 11, 2, 0, 8, 13, 1, 12
             //
           })
         }
@@ -647,42 +632,6 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 4) {
             //
             // list of IRQs occupied thus far:
             // 9, 5, 10, 11, 2, 0, 8, 13, 1, 12, 4, 3
-            //
-          })
-        }
-
-        //
-        // Floppy Disk Controller
-        //
-        Device (FDC) {
-          Name (_HID, EISAID ("PNP0700"))
-          Name (_CRS,ResourceTemplate() {
-            IO (Decode16, 0x3F0, 0x3F0, 0x01, 0x06)
-            IO (Decode16, 0x3F7, 0x3F7, 0x01, 0x01)
-            IRQNoFlags () {6}
-            //
-            // list of IRQs occupied thus far:
-            // 9, 5, 10, 11, 2, 0, 8, 13, 1, 12, 4, 3, 6
-            //
-            DMA (Compatibility, NotBusMaster, Transfer8) {2}
-          })
-        }
-
-        //
-        // parallel port -- no DMA for now
-        //
-        Device (PAR1) {
-          Name (_HID, EISAID ("PNP0400"))
-          Name (_DDN, "LPT1")
-          Name (_UID, 0x01)
-          Name(_CRS, ResourceTemplate() {
-            IO (Decode16, 0x0378, 0x0378, 0x00, 0x08)
-            IRQNoFlags () {7}
-            //
-            // list of IRQs occupied thus far:
-            // 9, 5, 10, 11, 2, 0, 8, 13, 1, 12, 4, 3, 6, 7
-            // in order:
-            // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
             //
           })
         }
