@@ -4,28 +4,31 @@
 #: variety = "basic"
 #: target = "helios-latest"
 #: output_rules = [
-#:   "/out/*",
+#:   "=/out/release/OVMF_CODE.fd",
+#:   "=/out/release/OVMF_CODE.fd.sha256.txt",
+#:   "=/out/debug/OVMF_CODE.fd",
+#:   "=/out/debug/OVMF_CODE.sha256.txt",
 #: ]
 #:
 #: [[publish]]
 #: series = "image_release"
-#: name = "OVMF_CODE.tar.gz"
-#: from_output = "/out/release/OVMF_CODE.tar.gz"
+#: name = "OVMF_CODE.fd"
+#: from_output = "/out/release/OVMF_CODE.fd"
 #:
 #: [[publish]]
 #: series = "image_release"
-#: name = "OVMF_CODE.tar.gz.sha256.txt"
-#: from_output = "/out/release/OVMF_CODE.tar.gz.sha256.txt"
+#: name = "OVMF_CODE.fd.sha256.txt"
+#: from_output = "/out/release/OVMF_CODE.fd.sha256.txt"
 #:
 #: [[publish]]
 #: series = "image_debug"
-#: name = "OVMF_CODE.tar.gz"
-#: from_output = "/out/debug/OVMF_CODE.tar.gz"
+#: name = "OVMF_CODE.fd"
+#: from_output = "/out/debug/OVMF_CODE.fd"
 #:
 #: [[publish]]
 #: series = "image_debug"
-#: name = "OVMF_CODE.tar.gz.sha256.txt"
-#: from_output = "/out/debug/OVMF_CODE.tar.gz.sha256.txt"
+#: name = "OVMF_CODE.fd.sha256.txt"
+#: from_output = "/out/debug/OVMF_CODE.fd.sha256.txt"
 
 set -o errexit
 set -o pipefail
@@ -44,23 +47,16 @@ chmod +x illumos/build.sh
 illumos/build.sh DEBUG
 illumos/build.sh RELEASE
 
-banner contents
-tar -czvf Build/OvmfX64/RELEASE_ILLGCC/FV/OVMF_CODE.tar.gz \
-    -C Build/OvmfX64/RELEASE_ILLGCC/FV OVMF_CODE.fd
-
-tar -czvf Build/OvmfX64/DEBUG_ILLGCC/FV/OVMF_CODE.tar.gz \
-    -C Build/OvmfX64/DEBUG_ILLGCC/FV OVMF_CODE.fd
-
 banner copy
 pfexec mkdir -p $release_dir
 pfexec mkdir -p $debug_dir
 pfexec chown "$UID" $release_dir
 pfexec chown "$UID" $debug_dir
-mv Build/OvmfX64/RELEASE_ILLGCC/FV/OVMF_CODE.tar.gz \
-    $release_dir/OVMF_CODE.tar.gz
-mv Build/OvmfX64/DEBUG_ILLGCC/FV/OVMF_CODE.tar.gz \
-    $debug_dir/OVMF_CODE.tar.gz
+mv Build/OvmfX64/RELEASE_ILLGCC/FV/OVMF_CODE.fd \
+    $release_dir/OVMF_CODE.fd
+mv Build/OvmfX64/DEBUG_ILLGCC/FV/OVMF_CODE.fd \
+    $debug_dir/OVMF_CODE.fd
 cd $release_dir
-digest -a sha256 OVMF_CODE.tar.gz > OVMF_CODE.tar.gz.sha256.txt
+digest -a sha256 OVMF_CODE.fd > OVMF_CODE.fd.sha256.txt
 cd $debug_dir
-digest -a sha256 OVMF_CODE.tar.gz > OVMF_CODE.tar.gz.sha256.txt
+digest -a sha256 OVMF_CODE.fd > OVMF_CODE.fd.sha256.txt
