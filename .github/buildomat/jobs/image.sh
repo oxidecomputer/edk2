@@ -7,7 +7,7 @@
 #:   "=/out/release/OVMF_CODE.fd",
 #:   "=/out/release/OVMF_CODE.fd.sha256.txt",
 #:   "=/out/debug/OVMF_CODE.fd",
-#:   "=/out/debug/OVMF_CODE.sha256.txt",
+#:   "=/out/debug/OVMF_CODE.fd.sha256.txt",
 #: ]
 #:
 #: [[publish]]
