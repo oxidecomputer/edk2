@@ -26,6 +26,7 @@
   Madt.aslc
   Facp.aslc
   Facs.aslc
+  Hpet.aslc
   Dsdt.asl
   Ssdt.asl
 
