@@ -635,6 +635,40 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 4) {
             //
           })
         }
+
+        //
+        // QEMU panic device
+        //
+        Device (PEVT)
+        {
+            Name (_HID, "QEMU0001")  // _HID: Hardware ID
+            Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+            {
+                IO (Decode16,
+                    0x0505,             // Range Minimum
+                    0x0505,             // Range Maximum
+                    0x01,               // Alignment
+                    0x01,               // Length
+                    )
+            })
+            OperationRegion (PEOR, SystemIO, 0x0505, One)
+            Field (PEOR, ByteAcc, NoLock, Preserve)
+            {
+                PEPT,   8
+            }
+
+            Name (_STA, 0x0F)  // _STA: Status
+            Method (RDPT, 0, NotSerialized)
+            {
+                Local0 = PEPT /* \_SB_.PCI0.S08_.PEVT.PEPT */
+                Return (Local0)
+            }
+
+            Method (WRPT, 1, NotSerialized)
+            {
+                PEPT = Arg0
+            }
+        }
       }
     }
   }
