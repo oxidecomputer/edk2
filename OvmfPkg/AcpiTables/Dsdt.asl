@@ -115,9 +115,9 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 4) {
             ReadWrite,
             0x00000000,          // Granularity
             0x8000000000,        // Min
-            0xFFFFFFFFFF,        // Max
+            0xFFFFFFFFFFF,       // Max
             0x00000000,          // Translation
-            0x8000000000,        // Range Length
+            0xF8000000000,       // Range Length
             ,                    // ResourceSourceIndex
             ,                    // ResourceSource
             PW64                 // DescriptorName
