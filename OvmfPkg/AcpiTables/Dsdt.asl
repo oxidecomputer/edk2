@@ -16,6 +16,16 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 4) {
   Name (\_S0, Package () {5, 0, 0, 0}) // Working
   Name (\_S5, Package () {0, 0, 0, 0}) // Soft Off
 
+  Scope (\_GPE) {
+    Name (_HID, "ACPI0006")
+
+    Method (_E01, 0, Serialized) {
+      Acquire (\_SB.PCI0.BLCK, 0xFFFF)
+      \_SB.PCI0.PCNT ()
+      Release (\_SB.PCI0.BLCK)
+    }
+  }
+
   //
   //  System Bus
   //
@@ -28,6 +38,478 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 4) {
       Name (_ADR, 0x00000000)
       Name (_BBN, 0x00)
       Name (_UID, 0x00)
+
+      OperationRegion (PCST, SystemIO, 0xAE00, 0x08)
+      Field (PCST, DWordAcc, NoLock, WriteAsZeros) {
+        PCIU,   32,
+        PCID,   32
+      }
+
+      OperationRegion (SEJ, SystemIO, 0xAE08, 0x04)
+      Field (SEJ, DWordAcc, NoLock, WriteAsZeros) {
+        B0EJ,   32
+      }
+
+      OperationRegion (BNMR, SystemIO, 0xAE10, 0x08)
+      Field (BNMR, DWordAcc, NoLock, WriteAsZeros) {
+        BNUM,   32,
+        PIDX,   32
+      }
+
+      Mutex (BLCK, 0x00)
+      Name (BSEL, Zero)
+
+      Method (PCNT, 0, NotSerialized) {
+        BNUM = Zero
+        DVNT (PCIU, One)
+        DVNT (PCID, 0x03)
+      }
+
+      Method (DVNT, 2, NotSerialized) {
+        If ((Arg0 & 0x00004)) {
+          Notify (DV02, Arg1)
+        }
+
+        If ((Arg0 & 0x00008)) {
+          Notify (DV03, Arg1)
+        }
+
+        If ((Arg0 & 0x00010)) {
+          Notify (DV04, Arg1)
+        }
+
+        If ((Arg0 & 0x00020)) {
+          Notify (DV05, Arg1)
+        }
+
+        If ((Arg0 & 0x00040)) {
+          Notify (DV06, Arg1)
+        }
+
+        If ((Arg0 & 0x00080)) {
+          Notify (DV07, Arg1)
+        }
+
+        If ((Arg0 & 0x00100)) {
+          Notify (DV08, Arg1)
+        }
+
+        If ((Arg0 & 0x00200)) {
+          Notify (DV09, Arg1)
+        }
+
+        If ((Arg0 & 0x00400)) {
+          Notify (DV10, Arg1)
+        }
+
+        If ((Arg0 & 0x00800)) {
+          Notify (DV11, Arg1)
+        }
+
+        If ((Arg0 & 0x01000)) {
+          Notify (DV12, Arg1)
+        }
+
+        If ((Arg0 & 0x02000)) {
+          Notify (DV13, Arg1)
+        }
+
+        If ((Arg0 & 0x04000)) {
+          Notify (DV14, Arg1)
+        }
+
+        If ((Arg0 & 0x08000)) {
+          Notify (DV15, Arg1)
+        }
+
+        If ((Arg0 & 0x10000)) {
+          Notify (DV16, Arg1)
+        }
+      }
+
+      Device (DV02) {
+        Name (_ADR, 0x00020000)
+        Name (ASUN, 0x02)
+        Name (_SUN, 0x02)
+
+        Method (_DSM, 4, Serialized) {
+          Local0 = Package (0x02) {
+            Zero,
+            Zero
+          }
+
+          Local0 [Zero] = BSEL 
+          Local0 [One] = ASUN
+
+          Return (PDSM (Arg0, Arg1, Arg2, Arg3, Local0))
+        }
+
+        Method (_EJ0, 1, NotSerialized) {
+          PCEJ (BSEL, _SUN)
+        }
+      }
+
+      Device (DV03) {
+        Name (_ADR, 0x00030000)
+        Name (ASUN, 0x03)
+        Name (_SUN, 0x03)
+
+        Method (_DSM, 4, Serialized) {
+          Local0 = Package (0x02) {
+            Zero,
+            Zero
+          }
+
+          Local0 [Zero] = BSEL 
+          Local0 [One] = ASUN
+
+          Return (PDSM (Arg0, Arg1, Arg2, Arg3, Local0))
+        }
+
+        Method (_EJ0, 1, NotSerialized) {
+          PCEJ (BSEL, _SUN)
+        }
+      }
+
+      Device (DV04) {
+        Name (_ADR, 0x00040000)
+        Name (ASUN, 0x04)
+        Name (_SUN, 0x04)
+
+        Method (_DSM, 4, Serialized) {
+          Local0 = Package (0x02) {
+            Zero,
+            Zero
+          }
+
+          Local0 [Zero] = BSEL 
+          Local0 [One] = ASUN
+
+          Return (PDSM (Arg0, Arg1, Arg2, Arg3, Local0))
+        }
+
+        Method (_EJ0, 1, NotSerialized) {
+          PCEJ (BSEL, _SUN)
+        }
+      }
+
+      Device (DV05) {
+        Name (_ADR, 0x00050000)
+        Name (ASUN, 0x05)
+        Name (_SUN, 0x05)
+
+        Method (_DSM, 4, Serialized) {
+          Local0 = Package (0x02) {
+            Zero,
+            Zero
+          }
+
+          Local0 [Zero] = BSEL 
+          Local0 [One] = ASUN
+
+          Return (PDSM (Arg0, Arg1, Arg2, Arg3, Local0))
+        }
+
+        Method (_EJ0, 1, NotSerialized) {
+          PCEJ (BSEL, _SUN)
+        }
+      }
+
+      Device (DV06) {
+        Name (_ADR, 0x00060000)
+        Name (ASUN, 0x06)
+        Name (_SUN, 0x06)
+
+        Method (_DSM, 4, Serialized) {
+          Local0 = Package (0x02) {
+            Zero,
+            Zero
+          }
+
+          Local0 [Zero] = BSEL 
+          Local0 [One] = ASUN
+
+          Return (PDSM (Arg0, Arg1, Arg2, Arg3, Local0))
+        }
+
+        Method (_EJ0, 1, NotSerialized) {
+          PCEJ (BSEL, _SUN)
+        }
+      }
+
+      Device (DV07) {
+        Name (_ADR, 0x00070000)
+        Name (ASUN, 0x07)
+        Name (_SUN, 0x07)
+
+        Method (_DSM, 4, Serialized) {
+          Local0 = Package (0x02) {
+            Zero,
+            Zero
+          }
+
+          Local0 [Zero] = BSEL 
+          Local0 [One] = ASUN
+
+          Return (PDSM (Arg0, Arg1, Arg2, Arg3, Local0))
+        }
+
+        Method (_EJ0, 1, NotSerialized) {
+          PCEJ (BSEL, _SUN)
+        }
+      }
+
+      Device (DV08) {
+        Name (_ADR, 0x00080000)
+        Name (ASUN, 0x08)
+        Name (_SUN, 0x08)
+
+        Method (_DSM, 4, Serialized) {
+          Local0 = Package (0x02) {
+            Zero,
+            Zero
+          }
+
+          Local0 [Zero] = BSEL 
+          Local0 [One] = ASUN
+
+          Return (PDSM (Arg0, Arg1, Arg2, Arg3, Local0))
+        }
+
+        Method (_EJ0, 1, NotSerialized) {
+          PCEJ (BSEL, _SUN)
+        }
+      }
+
+      Device (DV09) {
+        Name (_ADR, 0x00090000)
+        Name (ASUN, 0x09)
+        Name (_SUN, 0x09)
+
+        Method (_DSM, 4, Serialized) {
+          Local0 = Package (0x02) {
+            Zero,
+            Zero
+          }
+
+          Local0 [Zero] = BSEL 
+          Local0 [One] = ASUN
+
+          Return (PDSM (Arg0, Arg1, Arg2, Arg3, Local0))
+        }
+
+        Method (_EJ0, 1, NotSerialized) {
+          PCEJ (BSEL, _SUN)
+        }
+      }
+
+      Device (DV10) {
+        Name (_ADR, 0x000A0000)
+        Name (ASUN, 0x0A)
+        Name (_SUN, 0x0A)
+
+        Method (_DSM, 4, Serialized) {
+          Local0 = Package (0x02) {
+            Zero,
+            Zero
+          }
+
+          Local0 [Zero] = BSEL 
+          Local0 [One] = ASUN
+
+          Return (PDSM (Arg0, Arg1, Arg2, Arg3, Local0))
+        }
+
+        Method (_EJ0, 1, NotSerialized) {
+          PCEJ (BSEL, _SUN)
+        }
+      }
+
+      Device (DV11) {
+        Name (_ADR, 0x000B0000)
+        Name (ASUN, 0x0B)
+        Name (_SUN, 0x0B)
+
+        Method (_DSM, 4, Serialized) {
+          Local0 = Package (0x02) {
+            Zero,
+            Zero
+          }
+
+          Local0 [Zero] = BSEL 
+          Local0 [One] = ASUN
+
+          Return (PDSM (Arg0, Arg1, Arg2, Arg3, Local0))
+        }
+
+        Method (_EJ0, 1, NotSerialized) {
+          PCEJ (BSEL, _SUN)
+        }
+      }
+
+      Device (DV12) {
+        Name (_ADR, 0x000C0000)
+        Name (ASUN, 0x0C)
+        Name (_SUN, 0x0C)
+
+        Method (_DSM, 4, Serialized) {
+          Local0 = Package (0x02) {
+            Zero,
+            Zero
+          }
+
+          Local0 [Zero] = BSEL 
+          Local0 [One] = ASUN
+
+          Return (PDSM (Arg0, Arg1, Arg2, Arg3, Local0))
+        }
+
+        Method (_EJ0, 1, NotSerialized) {
+          PCEJ (BSEL, _SUN)
+        }
+      }
+
+      Device (DV13) {
+        Name (_ADR, 0x000D0000)
+        Name (ASUN, 0x0D)
+        Name (_SUN, 0x0D)
+
+        Method (_DSM, 4, Serialized) {
+          Local0 = Package (0x02) {
+            Zero,
+            Zero
+          }
+
+          Local0 [Zero] = BSEL 
+          Local0 [One] = ASUN
+
+          Return (PDSM (Arg0, Arg1, Arg2, Arg3, Local0))
+        }
+
+        Method (_EJ0, 1, NotSerialized) {
+          PCEJ (BSEL, _SUN)
+        }
+      }
+
+      Device (DV14) {
+        Name (_ADR, 0x000E0000)
+        Name (ASUN, 0x0E)
+        Name (_SUN, 0x0E)
+
+        Method (_DSM, 4, Serialized) {
+          Local0 = Package (0x02) {
+            Zero,
+            Zero
+          }
+
+          Local0 [Zero] = BSEL 
+          Local0 [One] = ASUN
+
+          Return (PDSM (Arg0, Arg1, Arg2, Arg3, Local0))
+        }
+
+        Method (_EJ0, 1, NotSerialized) {
+          PCEJ (BSEL, _SUN)
+        }
+      }
+
+      Device (DV15) {
+        Name (_ADR, 0x000F0000)
+        Name (ASUN, 0x0F)
+        Name (_SUN, 0x0F)
+
+        Method (_DSM, 4, Serialized) {
+          Local0 = Package (0x02) {
+            Zero,
+            Zero
+          }
+
+          Local0 [Zero] = BSEL 
+          Local0 [One] = ASUN
+
+          Return (PDSM (Arg0, Arg1, Arg2, Arg3, Local0))
+        }
+
+        Method (_EJ0, 1, NotSerialized) {
+          PCEJ (BSEL, _SUN)
+        }
+      }
+
+      Device (DV16) {
+        Name (_ADR, 0x00100000)
+        Name (ASUN, 0x10)
+        Name (_SUN, 0x10)
+
+        Method (_DSM, 4, Serialized) {
+          Local0 = Package (0x02) {
+            Zero,
+            Zero
+          }
+
+          Local0 [Zero] = BSEL 
+          Local0 [One] = ASUN
+
+          Return (PDSM (Arg0, Arg1, Arg2, Arg3, Local0))
+        }
+
+        Method (_EJ0, 1, NotSerialized) {
+          PCEJ (BSEL, _SUN)
+        }
+      }
+
+      Method (PDSM, 5, Serialized) {
+        If ((Arg2 == Zero)) {
+          Local0 = Buffer (One) {
+            0x00
+          }
+
+          If ((Arg0 != ToUUID ("e5c937d0-3553-4d7a-9117-ea4d19c3434d"))) {
+            Return (Local0)
+          }
+
+          If ((Arg1 < 0x02)) {
+            Return (Local0)
+          }
+
+          Local1 = Zero
+          Local2 = AIDX (DerefOf (Arg4 [Zero]), DerefOf (Arg4 [One]))
+          If (!((Local2 == Zero) | (Local2 == 0xFFFFFFFF))) {
+            Local1 |= One
+            Local1 |= (One << 0x07)
+          }
+
+          Local0 [Zero] = Local1
+          Return (Local0)
+        }
+
+        If ((Arg2 == 0x07)) {
+          Local2 = AIDX (DerefOf (Arg4 [Zero]), DerefOf (Arg4 [One]))
+          Local0 = Package (0x02){}
+          If (!((Local2 == Zero) || (Local2 == 0xFFFFFFFF))) {
+            Local0 [Zero] = Local2
+            Local0 [One] = ""
+          }
+
+          Return (Local0)
+        }
+      }
+
+      Method (AIDX, 2, NotSerialized) {
+        Acquire (BLCK, 0xFFFF)
+        BNUM = Arg0
+        PIDX = (One << Arg1)
+        Local0 = PIDX
+        Release (BLCK)
+        Return (Local0)
+      }
+
+      Method (PCEJ, 2, NotSerialized) {
+        Acquire (BLCK, 0xFFFF)
+        BNUM = Arg0
+        B0EJ = (One << Arg1)
+        Release (BLCK)
+        Return (Zero)
+      }
 
       //
       // BUS, I/O, and MMIO resources
