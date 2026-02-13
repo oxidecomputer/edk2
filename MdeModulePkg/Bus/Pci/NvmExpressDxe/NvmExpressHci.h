@@ -48,6 +48,14 @@ NvmeIdentifyController (
   IN VOID                               *Buffer
   );
 
+EFI_STATUS
+NvmeGetFeatures (
+  IN NVME_CONTROLLER_PRIVATE_DATA      *Private,
+  IN UINT32                             NamespaceId,
+  IN UINT8                              FeatureId,
+  OUT UINT32                           *DW0
+  );
+
 /**
   Get specified identify namespace data.
 

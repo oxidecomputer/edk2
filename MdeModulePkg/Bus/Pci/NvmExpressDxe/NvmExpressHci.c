@@ -512,6 +512,60 @@ NvmeIdentifyController (
 }
 
 /**
+  Get specified NVMe feature.
+
+  @param  Private          The pointer to the NVME_CONTROLLER_PRIVATE_DATA data structure.
+  @param  NamespaceId      The specified namespace identifier.
+  @param  FeatureId        The specified feature identifier.
+  @param  Data             A pointer to store the Dword attribute returned for the feature.
+
+  @return EFI_SUCCESS      Successfully get attribute for specified feature.
+  @return EFI_DEVICE_ERROR Fail to get attribute for specified feature.
+
+**/
+EFI_STATUS
+NvmeGetFeatures (
+  IN NVME_CONTROLLER_PRIVATE_DATA      *Private,
+  IN UINT32                             NamespaceId,
+  IN UINT8                              FeatureId,
+  OUT UINT32                           *Data
+  )
+{
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                  Command;
+  EFI_NVM_EXPRESS_COMPLETION               Completion;
+  EFI_STATUS                               Status;
+
+  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
+
+  CommandPacket.NvmeCmd        = &Command;
+  CommandPacket.NvmeCompletion = &Completion;
+
+  Command.Cdw0.Opcode = NVME_ADMIN_GET_FEATURES_CMD;
+  Command.Nsid        = NamespaceId;
+  CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
+  CommandPacket.QueueType      = NVME_ADMIN_QUEUE;
+
+  CommandPacket.NvmeCmd->Cdw10 = FeatureId;
+  CommandPacket.NvmeCmd->Flags = CDW10_VALID;
+
+  Status = Private->Passthru.PassThru (
+                               &Private->Passthru,
+                               NamespaceId,
+                               &CommandPacket,
+                               NULL
+                               );
+
+  if (!EFI_ERROR(Status)) {
+    *Data = Completion.DW0;
+  }
+
+  return Status;
+}
+
+/**
   Get specified identify namespace data.
 
   @param  Private          The pointer to the NVME_CONTROLLER_PRIVATE_DATA data structure.
