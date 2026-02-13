@@ -62,14 +62,14 @@ typedef union {
   };
 } OXIDE_DEVICE_FEATURES;
 
-EFI_STATUS
+VOID
 DiscoverVendorDeviceFeatures (
   IN NVME_CONTROLLER_PRIVATE_DATA       *Private,
   IN NVME_DEVICE_PRIVATE_DATA           *Device,
   UINT32                                NamespaceId
   )
 {
-  EFI_STATUS Status = EFI_SUCCESS;
+  EFI_STATUS Status;
 
   if (Private->ControllerData->Vid == OXIDE_VENDOR_ID) {
     OXIDE_DEVICE_FEATURES DevFeats;
@@ -88,11 +88,12 @@ DiscoverVendorDeviceFeatures (
     );
     if (EFI_ERROR(Status)) {
       DEBUG ((
-        EFI_D_INFO,
-        "%a: Failed to get Oxide Device Features.\n",
-        __FUNCTION__
+        EFI_D_WARN,
+        "%a: Failed to get Oxide Device Features (%r).\n",
+        __FUNCTION__,
+        Status
         ));
-      goto Exit;
+      return;
     }
 
     DEBUG ((
@@ -103,12 +104,9 @@ DiscoverVendorDeviceFeatures (
       ));
 
     if (DevFeats.ReadOnly) {
-      Device->Media.ReadOnly = 1;
+      Device->Media.ReadOnly = TRUE;
     }
   }
-
-Exit:
-  return Status;
 }
 
 /**
@@ -373,7 +371,7 @@ EnumerateNvmeDevNamespace (
       );
   }
 
-  Status = DiscoverVendorDeviceFeatures(Private, Device, NamespaceId);
+  DiscoverVendorDeviceFeatures(Private, Device, NamespaceId);
 
 Exit:
   if(NamespaceData != NULL) {
