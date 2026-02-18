@@ -515,9 +515,10 @@ NvmeIdentifyController (
   Get specified NVMe feature.
 
   @param  Private          The pointer to the NVME_CONTROLLER_PRIVATE_DATA data structure.
-  @param  NamespaceId      The specified namespace identifier.
+  @param  NamespaceId      The specified namespace identifier (or 0 if not relevant).
   @param  FeatureId        The specified feature identifier.
-  @param  Data             A pointer to store the Dword attribute returned for the feature.
+  @param  DW0              A pointer to store the feature-specific attributes as returned in Dword 0
+                           of the Completion Queue Entry.
 
   @return EFI_SUCCESS      Successfully get attribute for specified feature.
   @return EFI_DEVICE_ERROR Fail to get attribute for specified feature.
@@ -528,7 +529,7 @@ NvmeGetFeatures (
   IN NVME_CONTROLLER_PRIVATE_DATA      *Private,
   IN UINT32                             NamespaceId,
   IN UINT8                              FeatureId,
-  OUT UINT32                           *Data
+  OUT UINT32                           *DW0
   )
 {
   EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET CommandPacket;
@@ -559,7 +560,7 @@ NvmeGetFeatures (
                                );
 
   if (!EFI_ERROR(Status)) {
-    *Data = Completion.DW0;
+    *DW0 = Completion.DW0;
   }
 
   return Status;
