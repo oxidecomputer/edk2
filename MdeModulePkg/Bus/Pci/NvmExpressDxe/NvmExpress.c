@@ -41,6 +41,123 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_NVM_EXPRESS_PASS_THRU_MODE gEfiNvmExpressPassT
   0x10100
 };
 
+#define OXIDE_VENDOR_ID                         0x1DE
+#define OXIDE_PROPOLIS_NVME_DEV_ID              0x0
+
+/**
+ Oxide-specific feature retreived via the standard NVMe Get Features Command.
+
+ Provides device-specific features beyond the standard NVMe spec returned as a
+ single Dword result in Dword 0 of the Completion Queue Entry.
+
+   Bit 0 [ReadOnly] - If set, the device will complete all writes with
+                      STS_WRITE_READ_ONLY_RANGE.
+   Bits 31-1        - Reserved.
+ */
+#define OXIDE_VENDOR_FEATURE_PROPOLIS_DEVICE_FEATURES    0xF0
+
+typedef union {
+  UINT32   DW0;
+  struct {
+    UINT32 ReadOnly:1;
+    UINT32 Reserved:31;
+  };
+} OXIDE_DEVICE_FEATURES;
+
+VOID
+DiscoverVendorDeviceFeatures (
+  IN NVME_CONTROLLER_PRIVATE_DATA       *Private,
+  IN NVME_DEVICE_PRIVATE_DATA           *Device,
+  UINT32                                NamespaceId
+  )
+{
+  EFI_STATUS Status;
+  UINT16     VendorId;
+  UINT16     DeviceId;
+
+  // The VendorId is also present in the identify controller data but don't
+  // assume we've already issued an Identify command.
+
+  Status = Private->PciIo->Pci.Read(
+    Private->PciIo,
+    EfiPciIoWidthUint16,
+    PCI_VENDOR_ID_OFFSET,
+    1,
+    &VendorId
+    );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Failed to read VendorId: %r\n",
+      __FUNCTION__,
+      Status
+      ));
+    return;
+  }
+
+  Status = Private->PciIo->Pci.Read(
+    Private->PciIo,
+    EfiPciIoWidthUint16,
+    PCI_DEVICE_ID_OFFSET,
+    1,
+    &DeviceId
+    );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Failed to read DeviceId: %r\n",
+      __FUNCTION__,
+      Status
+      ));
+    return;
+  }
+
+  DEBUG ((
+    EFI_D_INFO,
+    "%a: Checking 0x%x:0x%x\n",
+    __FUNCTION__,
+    VendorId,
+    DeviceId
+    ));
+
+  if (VendorId == OXIDE_VENDOR_ID && DeviceId == OXIDE_PROPOLIS_NVME_DEV_ID) {
+    OXIDE_DEVICE_FEATURES DevFeats;
+
+    DEBUG ((
+      EFI_D_INFO,
+      "%a: Matched Oxide Propolis NVMe device -- getting device features.\n",
+      __FUNCTION__
+      ));
+
+    Status = NvmeGetFeatures(
+      Private,
+      NamespaceId,
+      OXIDE_VENDOR_FEATURE_PROPOLIS_DEVICE_FEATURES,
+      &DevFeats.DW0
+    );
+    if (EFI_ERROR(Status)) {
+      DEBUG ((
+        EFI_D_WARN,
+        "%a: Failed to get Oxide Device Features (%r).\n",
+        __FUNCTION__,
+        Status
+        ));
+      return;
+    }
+
+    DEBUG ((
+      EFI_D_INFO,
+      "%a: Oxide Device Features - 0x%x\n",
+      __FUNCTION__,
+      DevFeats.DW0
+      ));
+
+    if (DevFeats.ReadOnly) {
+      Device->Media.ReadOnly = TRUE;
+    }
+  }
+}
+
 /**
   Check if the specified Nvm Express device namespace is active, and create child handles
   for them with BlockIo and DiskInfo protocol instances.
@@ -302,6 +419,8 @@ EnumerateNvmeDevNamespace (
       FALSE
       );
   }
+
+  DiscoverVendorDeviceFeatures(Private, Device, NamespaceId);
 
 Exit:
   if(NamespaceData != NULL) {
