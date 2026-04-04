@@ -66,8 +66,6 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress
   gUefiOvmfPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
-  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Base
-  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Size
 
 [Depex]
   gEfiAcpiTableProtocolGuid
